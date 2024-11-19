@@ -2,16 +2,29 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { setupWebhook } = require('./webhook');
-
+const { fetchProducts } = require('./services/productService');
+const { formatResponse } = require('./utils/formatResponse');
+require('dotenv').config(); 
 const app = express();
+const port = 3000;
 
-// Configura body-parser para poder recibir el cuerpo de las solicitudes JSON
 app.use(bodyParser.json());
 
-// Configura el webhook
+
 setupWebhook(app);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+app.get('/products', async (req, res) => {
+  try {
+    const products = await fetchProducts();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
 });
+
+
+app.listen(port, () => {
+  console.log(`Bot server running on port ${port}`);
+});
+
