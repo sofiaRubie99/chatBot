@@ -1,13 +1,10 @@
-// bot.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const { setupWebhook } = require('./webhook');
-const { TELEGRAM_TOKEN } = require('./config');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 1000;
-
+const port = process.env.PORT || 3000;  // Cambiar a 3000 o usar el puerto proporcionado por Render
 
 app.use(bodyParser.json()); // Asegúrate de que puedas manejar el cuerpo JSON de Telegram
 
@@ -22,12 +19,4 @@ app.get('/', (req, res) => {
 // Inicia el servidor
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  // Aquí puedes configurar el webhook de Telegram, pero este paso generalmente se hace manualmente con el método de Telegram para setear el webhook
 });
-
-
-
-
-
-
-
