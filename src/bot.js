@@ -6,7 +6,7 @@ const { TELEGRAM_TOKEN } = require('./config');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 1000;
 
 
 app.use(bodyParser.json()); // Asegúrate de que puedas manejar el cuerpo JSON de Telegram
