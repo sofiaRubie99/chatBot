@@ -15,7 +15,9 @@ setupWebhook(app);
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente!');
 });
-
+app.get('/Hola', (req, res) => {
+  res.send('Hola Mundo!');
+});
 // Inicia el servidor
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
