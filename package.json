@@ -4,7 +4,7 @@
   "description": "Sweet Dreams Bot Telegram",
   "main": "src/bot.js",
   "scripts": {
-    "dev":"node src/bot.js",
+    "dev": "node src/bot.js",
     "start": "node src/bot.js"
   },
   "author": "",
@@ -19,5 +19,3 @@
   },
   "keywords": []
 }
-
-
