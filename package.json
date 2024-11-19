@@ -2,10 +2,11 @@
   "name": "sweetdreamscrbot",
   "version": "1.0.0",
   "description": "Sweet Dreams Bot Telegram",
-  "main": "index.js",
+  "main": "src/bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/bot.js"
+    "start": "node src/bot.js",
+    "dev":"node src/bot.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,3 +20,5 @@
   },
   "keywords": []
 }
+
+
