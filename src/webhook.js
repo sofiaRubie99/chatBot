@@ -8,23 +8,36 @@ function setupWebhook(app) {
     const chatId = message.chat.id;
     const text = message.text;
 
-    // Verificar el mensaje y responder según el comando
     if (text === '/getData') {
-      // Lógica para obtener los productos
-      const products = await fetchProducts();
-      const productData = JSON.stringify(products); // O formato necesario
+      try {
+        const products = await fetchProducts();
+        const productData = JSON.stringify(products);  // O formatea como lo necesites
 
-      // Enviar los productos al chat de Telegram
-      await fetch(TELEGRAM_API_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: `Here are the products:\n${productData}`,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+        // Responde al usuario con los datos de los productos
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          method: 'POST',
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `Here are the products:\n${productData}`,
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+      } catch (error) {
+        // En caso de error, envía un mensaje de error al usuario
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          method: 'POST',
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: 'There was an error retrieving the products.',
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
     }
 
-    res.send(); // Responder a Telegram
+    res.send();  // Asegúrate de responder a Telegram para evitar que se quede esperando
   });
 }
+
+module.exports = { setupWebhook };
