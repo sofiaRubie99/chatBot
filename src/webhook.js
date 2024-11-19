@@ -1,42 +1,94 @@
 const fetch = require('node-fetch');
-const { TELEGRAM_TOKEN } = require('./config');  // Asegúrate de que la variable TELEGRAM_TOKEN esté en tu archivo config.js
+const { TELEGRAM_TOKEN } = require('./config');
+const { fetchProducts } = require('./services/productService');
 
-// Función para configurar el webhook
+const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
+
 function setupWebhook(app) {
   app.post('/webhook', async (req, res) => {
-    const message = req.body.message;
-    const chatId = message.chat.id;
-    const text = message.text;
+    try {
+      const message = req.body.message;
 
-    if (text === '/getData') {
-      try {
-        const products = await fetchProducts();
-        const productData = JSON.stringify(products);  // O formatea como lo necesites
+      if (!message || !message.chat || !message.text) {
+        res.status(200).send(); // Confirmamos la recepción del webhook aunque no haya datos relevantes
+        return;
+      }
 
-        // Responde al usuario con los datos de los productos
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      const chatId = message.chat.id;
+      const text = message.text;
+
+      if (text === '/getData') {
+        try {
+          const products = await fetchProducts();
+
+          const productList = products
+            .map(
+              (product, index) =>
+                `${index + 1}. ${product.name} - $${product.price}`
+            )
+            .join('\n');
+
+          const replyText = productList || 'No products found.';
+
+          await fetch(`${TELEGRAM_API_URL}/sendMessage`, {
+            method: 'POST',
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `Here are the products:\n${replyText}`,
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        } catch (error) {
+          console.error('Error fetching products:', error);
+
+          await fetch(`${TELEGRAM_API_URL}/sendMessage`, {
+            method: 'POST',
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: 'There was an error retrieving the products. Please try again later.',
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        }
+      } else if (text === '/location') {
+        // Enviar una ubicación predefinida
+        const latitude = 37.7749; // Ejemplo: San Francisco, CA
+        const longitude = -122.4194;
+
+        await fetch(`${TELEGRAM_API_URL}/sendLocation`, {
           method: 'POST',
           body: JSON.stringify({
             chat_id: chatId,
-            text: `Here are the products:\n${productData}`,
+            latitude: latitude,
+            longitude: longitude,
           }),
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-
-      } catch (error) {
-        // En caso de error, envía un mensaje de error al usuario
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      } else {
+        // Respuesta para comandos desconocidos
+        await fetch(`${TELEGRAM_API_URL}/sendMessage`, {
           method: 'POST',
           body: JSON.stringify({
             chat_id: chatId,
-            text: 'There was an error retrieving the products.',
+            text: `Sorry, I didn't understand the command: "${text}".`,
           }),
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
       }
-    }
 
-    res.send();  // Asegúrate de responder a Telegram para evitar que se quede esperando
+      res.status(200).send(); // Confirmamos que el webhook procesó la solicitud
+    } catch (error) {
+      console.error('Error handling webhook:', error);
+      res.status(500).send(); // Indicamos un error en el servidor
+    }
   });
 }
 
