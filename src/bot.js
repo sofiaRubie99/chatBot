@@ -8,23 +8,14 @@ require('dotenv').config();
 const app = express();
 const port = 3000;
 
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // Asegúrate de que puedas manejar el cuerpo JSON de Telegram
 
-
+// Configura las rutas para los webhooks de Telegram
 setupWebhook(app);
 
-
-app.get('/products', async (req, res) => {
-  try {
-    const products = await fetchProducts();
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch products' });
-  }
-});
-
-
-app.listen(port, () => {
-  console.log(`Bot server running on port ${port}`);
+// Inicia el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
