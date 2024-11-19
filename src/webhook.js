@@ -1,12 +1,10 @@
 // webhook.js
 module.exports.setupWebhook = function(app) {
+  // El endpoint para recibir los mensajes de Telegram
   app.post('/webhook', (req, res) => {
-    // Aquí procesas el mensaje que viene de Telegram
+    // Aquí procesas los datos que Telegram envía
     const message = req.body.message;
-    const chatId = message.chat.id;
-    const text = message.text;
-
-    // Lógica para responder al mensaje
-    res.send('Mensaje recibido');
+    console.log('Nuevo mensaje recibido:', message);  // Solo para depuración
+    res.send('OK');
   });
 };
